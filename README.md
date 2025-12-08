@@ -4,7 +4,7 @@ Um aplicativo de sorteio de nomes robusto, que funciona em uma única página HT
 
 ## 🚀 Como Usar
 
-1.  **Baixe:** Salve o código completo em um arquivo `.html` (ex: `sorteio.html`).
+1.  **Baixe:** Salve o arquivo Sorteador de Nomes com .html (ex: `Sorteador de Nomes.html`).
 2.  **Abra:** Dê um duplo clique no arquivo para executá-lo no seu navegador.
 
 > **Nota:** Seus dados (candidatos e sorteados) são salvos automaticamente no seu navegador (`localStorage`).
