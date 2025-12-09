@@ -117,12 +117,34 @@
             flex-direction: column;
         }
 
-        h2 {
-            font-size: 1.1em;
+        /* --- NOVO CSS PARA AÇÕES CONTEXTUAIS --- */
+        .titulo-com-acoes {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin: 0 0 8px;
+        }
+
+        .titulo-com-acoes h2 {
+            font-size: 1.1em;
+            margin: 0;
             color: var(--cor-primaria);
             font-weight: 700;
         }
+
+        .titulo-com-acoes .grupo-botoes-lista button {
+            padding: 6px 10px; /* Botões menores no título */
+            font-size: 14px;
+            height: 30px; /* Altura fixa */
+            width: 30px; /* Largura fixa */
+            line-height: 1;
+            border-radius: 8px;
+            margin-left: 5px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+        /* --- FIM NOVO CSS --- */
 
         .lista-box {
             background: var(--cor-fundo);
@@ -176,7 +198,6 @@
         }
         
         .input-area input[type="file"] {
-            /* Estilo para garantir que o input de arquivo funcione bem */
             line-height: 24px; 
         }
 
@@ -199,18 +220,16 @@
         #btnSortear {
             background-color: var(--cor-primaria);
             font-size: 18px;
+            width: 100%; /* Ocupa a largura total da área principal */
         }
+        
+        /* Botões de Ação Contextual (Títulos) */
+        #btnImprimirSorteados { background-color: var(--cor-imprimir); } /* Azul */
+        #btnExportarCSV { background-color: var(--cor-continuar); } /* Verde */
+        #btnResetarSorteados { background-color: var(--cor-aviso); } /* Laranja */
+        #btnLimparSorteados { background-color: var(--cor-excluir); } /* Vermelho */
+        #btnLimparCandidatos { background-color: var(--cor-excluir); } /* Vermelho */
 
-        #btnImprimirSorteados { background-color: var(--cor-imprimir); }
-        #btnResetarSorteados { background-color: var(--cor-aviso); }
-        #btnLimparSorteados { background-color: var(--cor-excluir); }
-        #btnExportarCSV { background-color: var(--cor-continuar); }
-
-        .area-botoes-principais {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
 
         .resultado {
             margin-top: 6px;
@@ -269,7 +288,6 @@
         }
 
         .overlay-inner {
-            /* Ajustado após remover a sidebar */
             display: block; 
             width: 90vw;
             max-width: 1400px;
@@ -277,7 +295,6 @@
         }
 
         .overlay-main {
-            /* Ajustado para ocupar o espaço total */
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -292,7 +309,6 @@
             text-shadow: 0 0 25px rgba(102, 187, 106, 0.9);
         }
         
-        /* NOVA ANIMAÇÃO DE FADE/PISCADA */
         .animacao-sorteio-fs {
             animation: fadeRoll 0.1s linear infinite;
         }
@@ -419,7 +435,7 @@
     <div class="container">
         <div class="topo">
             <h1>🏆 Sorteio Corporativo</h1>
-            <button id="btnTema" class="btn-tema">Alternar Tema Claro/Escuro</button>
+            <button id="btnTema" class="btn-tema">Alternar Tema</button>
         </div>
 
         <div class="progress-container">
@@ -429,35 +445,39 @@
 
         <div class="content-wrapper">
             <div class="lista-secao">
-                <h2>Candidatos (Total: <span id="contadorCandidatos"></span>)</h2>
+                <div class="titulo-com-acoes">
+                    <h2>Candidatos (<span id="contadorCandidatos"></span>)</h2>
+                    <div class="grupo-botoes-lista">
+                        <button id="btnLimparCandidatos" class="btn-acao" style="background-color: var(--cor-excluir);" title="Limpar todos os Candidatos">🗑️</button>
+                    </div>
+                </div>
                 <div class="lista-box" id="listaNomes"></div>
 
                 <div class="input-area">
-                    <input type="text" id="novoNome" placeholder="Adicionar novo nome" />
-                    <button id="btnAdicionar">Adicionar</button>
+                    <input type="text" id="novoNome" placeholder="Adicionar novo nome (Enter)" />
+                    <button id="btnAdicionar" title="Adicionar Nome">➕</button>
                 </div>
                 
                 <div class="input-area" style="margin-top: 10px;">
                     <input type="file" id="arquivoNomes" accept=".txt, .csv" style="flex: 1; padding: 4px;"/>
-                    <button id="btnImportar" class="btn-acao" style="background-color: var(--cor-secundaria);">Importar Lista</button>
-                    <button id="btnLimparCandidatos" class="btn-acao" style="background-color: var(--cor-excluir);">🗑️ Limpar Candidatos</button>
+                    <button id="btnImportar" class="btn-acao" style="background-color: var(--cor-secundaria);" title="Importar Lista">📦</button>
                 </div>
-                </div>
-
+            </div>
             <div class="lista-secao">
-                <h2>Sorteados (Vencedores)</h2>
+                <div class="titulo-com-acoes">
+                    <h2>Sorteados (Vencedores)</h2>
+                    <div class="grupo-botoes-lista">
+                        <button id="btnImprimirSorteados" class="btn-acao" style="background-color: var(--cor-imprimir);" title="Imprimir Vencedores">🖨️</button>
+                        <button id="btnExportarCSV" class="btn-acao" style="background-color: var(--cor-continuar);" title="Exportar CSV">📄</button>
+                        <button id="btnResetarSorteados" class="btn-acao" style="background-color: var(--cor-aviso);" title="Voltar para Candidatos">↩️</button>
+                        <button id="btnLimparSorteados" class="btn-acao" style="background-color: var(--cor-excluir);" title="Excluir Sorteados">🗑️</button>
+                    </div>
+                </div>
                 <div class="lista-box" id="listaSorteados"></div>
             </div>
-        </div>
+            </div>
 
-        <div class="area-botoes-principais">
-            <button id="btnSortear" class="btn-acao">INICIAR SORTEIO EM TELA CHEIA</button>
-            <button id="btnImprimirSorteados" class="btn-acao">🖨️ Imprimir Vencedores</button>
-            <button id="btnExportarCSV" class="btn-acao">📄 Exportar CSV</button>
-            <button id="btnResetarSorteados" class="btn-acao">↩️ Voltar Nomes p/ Sorteio</button>
-            <button id="btnLimparSorteados" class="btn-acao">Excluir Sorteados</button>
-        </div>
-
+        <button id="btnSortear" class="btn-acao">INICIAR SORTEIO EM TELA CHEIA</button>
         <div class="linha-auto">
             <label>
                 <input type="checkbox" id="chkAuto" />
@@ -518,7 +538,7 @@
         // DOM NOVOS
         const arquivoNomesInput = document.getElementById('arquivoNomes');
         const btnImportar = document.getElementById('btnImportar');
-        const btnLimparCandidatos = document.getElementById('btnLimparCandidatos'); // NOVO BOTÃO
+        const btnLimparCandidatos = document.getElementById('btnLimparCandidatos'); 
 
         const overlayEl = document.getElementById('tela-cheia-overlay');
         const textoFullscreenEl = document.getElementById('texto-sorteio-fullscreen');
@@ -619,7 +639,7 @@
             const ulNomes = document.createElement('ul');
             nomes.forEach(nome => {
                 const li = document.createElement('li');
-                li.innerHTML = `<span>${nome}</span><button class="btn-excluir" data-nome="${nome}">X</button>`;
+                li.innerHTML = `<span>${nome}</span><button class="btn-excluir" data-nome="${nome}" title="Remover">X</button>`;
                 ulNomes.appendChild(li);
             });
             listaNomesEl.innerHTML = '';
@@ -927,7 +947,7 @@
         
         // EVENTOS NOVOS
         btnImportar.addEventListener('click', importarNomes);
-        btnLimparCandidatos.addEventListener('click', limparCandidatos); // NOVO EVENTO
+        btnLimparCandidatos.addEventListener('click', limparCandidatos); 
 
         btnLimparSorteados.addEventListener('click', limparSorteados);
         btnImprimirSorteados.addEventListener('click', imprimirSorteados);
