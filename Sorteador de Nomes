@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>Sorteio Corporativo - Sequencial Interativo</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -9,14 +10,14 @@
 
         /* --- Variáveis de Tema (Dr Hasegawa) --- */
         :root { 
-            --cor-primaria: #388E3C; /* Verde escuro */
-            --cor-secundaria: #66BB6A; /* Verde claro */
-            --cor-fundo: #E8F5E9; /* Verde muito claro para fundo */
+            --cor-primaria: #388E3C; 
+            --cor-secundaria: #66BB6A; 
+            --cor-fundo: #E8F5E9; 
             --cor-texto: #2E3A42;
             --cor-fundo-card: #fff;
             --cor-excluir: #E53935;
-            --cor-aviso: #FF9800; /* Laranja para Reset */
-            --cor-imprimir: #42A5F5; /* Azul para Imprimir */
+            --cor-aviso: #FF9800; 
+            --cor-imprimir: #42A5F5; 
         }
 
         body {
@@ -49,6 +50,7 @@
             color: var(--cor-primaria);
             border-bottom: 3px solid var(--cor-secundaria);
             padding-bottom: 10px;
+            font-size: 2em; 
         }
 
         .content-wrapper {
@@ -171,7 +173,6 @@
             box-shadow: none;
         }
         
-        /* Controles de Sorteio de Quantidade Ocultado */
         .controles-sorteio { display: none; }
 
         button#btnSortear {
@@ -296,6 +297,78 @@
                 font-size: 14pt;
             }
         }
+        
+        /* 📱 AJUSTES DE RESPONSIVIDADE PARA SMARTPHONES (Redmi, etc.) 📱 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                height: auto; 
+                min-height: 100vh;
+            }
+            
+            .container {
+                padding: 15px;
+                gap: 15px;
+                width: 100%;
+                max-width: 600px; 
+            }
+            
+            h1 {
+                font-size: 1.8em;
+                padding-bottom: 5px;
+            }
+
+            .content-wrapper {
+                flex-direction: column; 
+                gap: 20px;
+            }
+            
+            .lista-secao {
+                width: 100%; 
+            }
+            
+            .lista-box {
+                height: 150px; 
+            }
+
+            .resultado {
+                font-size: 30px; 
+                padding: 15px;
+            }
+            
+            .resultado.vencedor {
+                font-size: 32px;
+            }
+
+            button#btnSortear {
+                font-size: 18px;
+                padding: 12px 20px;
+            }
+            
+            .area-botoes-principais {
+                gap: 10px;
+            }
+            
+            .input-area {
+                 flex-wrap: wrap;
+                 gap: 5px;
+            }
+            
+            .input-area input[type="text"], 
+            .input-area button {
+                padding: 10px 15px;
+            }
+
+            .area-botoes-principais button {
+                 flex-basis: calc(50% - 5px); 
+            }
+
+            button#btnSortear, 
+            button#btnContinuar {
+                flex-basis: 100%;
+            }
+        }
+        /* 📱 FIM DOS AJUSTES DE RESPONSIVIDADE 📱 */
         
     </style>
 </head>
@@ -524,14 +597,17 @@
             btnLimparSorteados.disabled = nomesSorteados.length === 0 || isDrawing;
             btnResetarSorteados.disabled = nomesSorteados.length === 0 || isDrawing;
             
-            // Controles de Adição/Exclusão devem ser desabilitados durante a rolagem OU a pausa.
-            btnAdicionar.disabled = isDrawing || isPaused;
-            novoNomeInput.disabled = isDrawing || isPaused;
-            document.querySelectorAll('.btn-excluir').forEach(btn => btn.disabled = isDrawing || isPaused);
+            // ⭐️ AJUSTE AQUI: Controles de Adição/Exclusão só devem ser desabilitados durante a ROLAGEM
+            btnAdicionar.disabled = isDrawing;
+            novoNomeInput.disabled = isDrawing;
+            document.querySelectorAll('.btn-excluir').forEach(btn => btn.disabled = isDrawing);
 
-            // Garantir que o botão Continuar esteja ativo durante a pausa
+            // Garante que o botão Continuar esteja ativo durante a pausa
             if(isPaused) {
                 btnContinuar.disabled = false;
+            } else if (nomes.length === 0 && !isDrawing) {
+                btnSortear.disabled = true;
+                resultadoEl.textContent = "🥳 Sorteio Finalizado! Lista de Candidatos vazia.";
             }
             
             // 4. Salvar no Local Storage
@@ -553,13 +629,13 @@
                 btnSortear.style.display = 'none';
                 btnContinuar.style.display = 'block';
                 
-                // Atualiza o texto do botão
-                const restantes = nomes.length > 0 ? `(${nomes.length} restantes)` : `(Finalizar Sorteio)`;
-                btnContinuar.textContent = `Continuar Sorteio ${restantes}`;
+                // ⭐️ AJUSTE AQUI: Removemos o texto da contagem duplicada do botão
+                btnContinuar.textContent = `Continuar Sorteio`; 
                 
                 // Os botões auxiliares estão liberados pela lógica de atualizarLista
                 btnContinuar.disabled = false;
                 
+                // Chamamos atualizarLista para aplicar o estado 'isPaused' corretamente
                 atualizarLista(); 
             });
         }
@@ -571,11 +647,9 @@
                 btnContinuar.style.display = 'none';
                 btnSortear.style.display = 'block';
                 
-                // Reabilita controles de adição/exclusão antes de liberar a Promise
-                document.querySelectorAll('.btn-acao').forEach(btn => btn.disabled = false);
-                document.querySelectorAll('.btn-excluir').forEach(btn => btn.disabled = false);
-                novoNomeInput.disabled = false;
+                // A atualização da lista (incluindo o re-enable de botões) ocorrerá implicitamente antes do próximo sorteio
                 
+                // ⭐️ Importante: Chamar atualizarLista antes de resolver a promise para garantir que o Sortear não fique desabilitado sem motivo se houver nomes
                 atualizarLista();
 
                 // O fluxo de sorteio é reiniciado/continuado
@@ -614,10 +688,10 @@
 
             while (nomes.length > 0) {
                 
-                // Desabilitar todos os botões no INÍCIO do sorteio (exceto os auxiliares que serão liberados por atualizarLista)
+                // Desabilitar todos os botões no INÍCIO do sorteio
                 document.querySelectorAll('.btn-acao, .input-area button').forEach(btn => btn.disabled = true);
-                novoNomeInput.disabled = true;
                 document.querySelectorAll('.btn-excluir').forEach(btn => btn.disabled = true);
+                novoNomeInput.disabled = true;
 
                 // --- SORTEIO DE 1 VENCEDOR ---
                 
@@ -652,14 +726,13 @@
                 const nomeIndex = nomes.indexOf(nomeVencedor); 
                 nomesSorteados.unshift(nomes.splice(nomeIndex, 1)[0]);
                 
-                // Chama atualizarLista para liberar os botões auxiliares (Imprimir/Resetar/Limpar)
+                // Chama atualizarLista para liberar os botões auxiliares
                 atualizarLista(); 
                 
-                await sleep(4000); // Espera pela animação de confetes/música
+                await sleep(4000); 
 
                 // --- PAUSA INTERATIVA ---
                 
-                // Se houver mais nomes, espera o clique para continuar
                 if (nomes.length > 0) {
                     await waitForUserClick(); // Espera pelo clique no botão Continuar
                 } 
@@ -668,13 +741,13 @@
 
             // Finaliza quando a lista estiver vazia
             
-            btnSortear.style.display = 'block'; // Volta o Sortear (embora desabilitado)
+            btnSortear.style.display = 'block'; 
             btnContinuar.style.display = 'none';
             
             resultadoEl.classList.remove('vencedor');
             resultadoEl.textContent = "🥳 Sorteio Finalizado! Todos os candidatos foram sorteados.";
             
-            // Reabilita todos os controles (Adicionar/Resetar/Imprimir/Limpar)
+            // Reabilita todos os controles
             document.querySelectorAll('.btn-acao, .input-area button').forEach(btn => btn.disabled = false);
             novoNomeInput.disabled = false;
             novoNomeInput.value = '';
