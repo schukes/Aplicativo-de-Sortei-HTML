@@ -516,8 +516,7 @@
         }
 
         let nomes = carregarJSON('sorteio_candidatos', [
-            "Felipe Martins", "Tiago Guedes", "Leticia", "Rodrigo", "Isadora",
-            "Camila Beatriz", "Fernando", "Tiago Hasegawa", "Yasmim"
+            "Fulano1", "Fulano2"
         ]);
         let nomesSorteados = carregarJSON('sorteio_sorteados', []);
         let logSorteios = carregarJSON('sorteio_log', []);
