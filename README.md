@@ -35,6 +35,6 @@ Os botões auxiliares de gerenciamento de listas permanecem **ativos** mesmo dur
 | **Adicionar/Excluir** | Adicionar um novo nome ou excluir um candidato existente. | **BLOQUEADO** (Apenas durante a pausa ou rolagem, para proteger a integridade do sorteio em andamento). |
 
 ---
-Para usalo basta salvar o codigo em html e abrir com o navegador
+Para usalo basta baixar o documeto e salvar com .html e abrir com o navegador
 
 ## ⚙
