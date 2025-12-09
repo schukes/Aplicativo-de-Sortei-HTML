@@ -1,15 +1,14 @@
-<!DOCTYPE TEMA-DA-VITORIA-COMPLETO html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
-    <title>Sorteio Corporativo - Dr Hasegawa</title>
+    <title>Sorteio Corporativo - Sequencial Interativo</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
 
-        /* Por Tiago Hasegawa */
-        /* Cores Verde Corporativo */
-        :root {
+        /* --- Variáveis de Tema (Dr Hasegawa) --- */
+        :root { 
             --cor-primaria: #388E3C; /* Verde escuro */
             --cor-secundaria: #66BB6A; /* Verde claro */
             --cor-fundo: #E8F5E9; /* Verde muito claro para fundo */
@@ -171,30 +170,10 @@
             cursor: not-allowed;
             box-shadow: none;
         }
+        
+        /* Controles de Sorteio de Quantidade Ocultado */
+        .controles-sorteio { display: none; }
 
-        .controles-sorteio {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-top: 10px;
-            padding: 15px;
-            border-top: 1px solid #eee;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .controles-sorteio label {
-            font-weight: 700;
-            font-size: 0.95em;
-        }
-        
-        .controles-sorteio input[type="number"] {
-            width: 60px;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            text-align: center;
-        }
-        
         button#btnSortear {
             background-color: var(--cor-primaria);
             margin-top: 15px;
@@ -247,7 +226,6 @@
 
         .resultado {
             margin-top: 20px;
-            /* Aumentado para destacar o nome */
             font-size: 48px; 
             font-weight: 900;
             color: var(--cor-texto);
@@ -263,7 +241,7 @@
         }
         
         .resultado.animacao-sorteio {
-            font-size: 36px; /* Volta o tamanho durante a rolagem */
+            font-size: 36px;
             animation: rollEffect 0.08s infinite alternate;
         }
         
@@ -273,7 +251,7 @@
         }
 
         .resultado.vencedor {
-            font-size: 48px; /* Mantém o tamanho grande para o vencedor */
+            font-size: 48px;
             background-color: #f1f8e9;
             border-color: var(--cor-primaria);
             color: var(--cor-primaria);
@@ -344,10 +322,10 @@
             </div>
         </div>
         
-        <div class="controles-sorteio">
+        <div class="controles-sorteio" style="display: none;">
              <label for="numVencedores">Sortear:</label>
              <input type="number" id="numVencedores" value="1" min="1" max="10" />
-             <label for="numVencedores">vencedor(es)</label>
+             <label for="numVencedores">vencedor(es) no total</label>
         </div>
         
         <div class="area-botoes-principais">
@@ -389,9 +367,12 @@
             "Camila Beatriz", "Fernando", "Tiago Hasegawa", "Yasmim"
         ]);
         let nomesSorteados = carregarNomes('sorteio_sorteados', []);
+        
+        // --- Variáveis de Controle de Pausa ---
         let sorteioPausado = false; 
         let resolvePausa; 
-        
+        // --- FIM Variáveis de Controle de Pausa ---
+
         // Contexto de Áudio para geração de som
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
@@ -403,17 +384,14 @@
         const novoNomeInput = document.getElementById('novoNome');
         const btnAdicionar = document.getElementById('btnAdicionar');
         const contadorCandidatosEl = document.getElementById('contadorCandidatos');
-        const numVencedoresInput = document.getElementById('numVencedores');
         const btnLimparSorteados = document.getElementById('btnLimparSorteados');
         const btnImprimirSorteados = document.getElementById('btnImprimirSorteados');
         const btnResetarSorteados = document.getElementById('btnResetarSorteados');
-        const btnContinuar = document.getElementById('btnContinuar'); // Botão de Continuação
+        const btnContinuar = document.getElementById('btnContinuar'); 
 
-        // --- Funções de Som ---
+
+        // --- Funções de Som (Sem Alteração) ---
         
-        /**
-         * Gera um beep curto para a roleta.
-         */
         function playClickBeep(delay = 0) {
             if (audioContext.state === 'suspended') return;
 
@@ -435,7 +413,6 @@
             oscillator.stop(audioContext.currentTime + delay + duration);
         }
 
-        // 🎼 SIMULAÇÃO DO TEMA DA VITÓRIA (AYRTON SENNA)
         function playWinnerMelody() {
             if (audioContext.state === 'suspended') return;
             
@@ -468,7 +445,7 @@
             const eighth = quarter * 0.5; 
             const vol = 0.5;
             
-            // Compasso 1
+            // Melodia
             playNote(C5, time, dottedQuarter, vol);
             playNote(D5, time + dottedQuarter, eighth, vol);
             time += (dottedQuarter + eighth);
@@ -477,7 +454,6 @@
             playNote(D5, time + dottedQuarter, eighth, vol);
             time += (dottedQuarter + eighth);
 
-            // Compasso 2
             playNote(C5, time, dottedQuarter, vol);
             playNote(D5, time + dottedQuarter, eighth, vol);
             time += (dottedQuarter + eighth);
@@ -486,13 +462,11 @@
             playNote(G5, time + dottedQuarter, eighth, vol);
             time += (dottedQuarter + eighth);
             
-            // Compasso 3
             playNote(C6, time, quarter, vol * 1.2, 'sine'); time += quarter;
             playNote(A5, time, quarter, vol * 1.2, 'sine'); time += quarter;
             playNote(G5, time, quarter, vol * 1.2, 'sine'); time += quarter;
             playNote(E5, time, quarter, vol * 1.2, 'sine'); time += quarter;
             
-            // Compasso 4 (Final)
             playNote(C6, time, 1.2, vol * 1.5, 'triangle'); 
             playNote(E5, time, 1.2, vol * 1.5, 'triangle');
             playNote(G5, time, 1.2, vol * 1.5, 'triangle');
@@ -538,18 +512,28 @@
             // 3. Atualizar Contador e botões
             contadorCandidatosEl.textContent = nomes.length;
             
-            // Botões de controle de lista devem ser desabilitados durante o sorteio
-            const isSorteando = resultadoEl.classList.contains('animacao-sorteio') || btnContinuar.style.display !== 'none';
-            btnSortear.disabled = nomes.length === 0 || isSorteando;
-            btnImprimirSorteados.disabled = nomesSorteados.length === 0 || isSorteando;
-            btnLimparSorteados.disabled = nomesSorteados.length === 0 || isSorteando;
-            btnResetarSorteados.disabled = nomesSorteados.length === 0 || isSorteando;
-            btnAdicionar.disabled = isSorteando;
-            novoNomeInput.disabled = isSorteando;
-            document.querySelectorAll('.btn-excluir').forEach(btn => btn.disabled = isSorteando);
-            numVencedoresInput.disabled = isSorteando;
+            // Determinar estados de bloqueio
+            const isDrawing = resultadoEl.classList.contains('animacao-sorteio'); // TRUE durante a rolagem de nomes
+            const isPaused = btnContinuar.style.display !== 'none'; // TRUE durante a pausa interativa
 
+            // Botão Sortear principal é desabilitado se a lista estiver vazia ou se estiver em sorteio/pausa
+            btnSortear.disabled = nomes.length === 0 || isDrawing || isPaused;
+            
+            // Botões auxiliares de Imprimir/Limpar/Resetar SÓ SÃO DESABILITADOS DURANTE A ROLAGEM
+            btnImprimirSorteados.disabled = nomesSorteados.length === 0 || isDrawing;
+            btnLimparSorteados.disabled = nomesSorteados.length === 0 || isDrawing;
+            btnResetarSorteados.disabled = nomesSorteados.length === 0 || isDrawing;
+            
+            // Controles de Adição/Exclusão devem ser desabilitados durante a rolagem OU a pausa.
+            btnAdicionar.disabled = isDrawing || isPaused;
+            novoNomeInput.disabled = isDrawing || isPaused;
+            document.querySelectorAll('.btn-excluir').forEach(btn => btn.disabled = isDrawing || isPaused);
 
+            // Garantir que o botão Continuar esteja ativo durante a pausa
+            if(isPaused) {
+                btnContinuar.disabled = false;
+            }
+            
             // 4. Salvar no Local Storage
             salvarNomes('sorteio_candidatos', nomes);
             salvarNomes('sorteio_sorteados', nomesSorteados);
@@ -559,43 +543,43 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
         
-        // NOVO: Função de Pausa Manual
+        // Função de Pausa Manual
         function waitForUserClick() {
             return new Promise(resolve => {
                 resolvePausa = resolve;
                 sorteioPausado = true;
                 
-                // Esconde o botão Sortear/Outras Ações e mostra o Continuar
+                // Esconde o botão Sortear e mostra o Continuar
                 btnSortear.style.display = 'none';
                 btnContinuar.style.display = 'block';
                 
                 // Atualiza o texto do botão
-                btnContinuar.textContent = (nomes.length > 0) ? `Continuar Sorteio (Próximo Vencedor)` : 'Finalizar Sorteio';
+                const restantes = nomes.length > 0 ? `(${nomes.length} restantes)` : `(Finalizar Sorteio)`;
+                btnContinuar.textContent = `Continuar Sorteio ${restantes}`;
                 
-                // Desabilita outras ações, mas permite continuar
-                document.querySelectorAll('.btn-acao:not(#btnContinuar)').forEach(btn => btn.disabled = true);
+                // Os botões auxiliares estão liberados pela lógica de atualizarLista
                 btnContinuar.disabled = false;
                 
-                // Garante que a lista também não seja alterada enquanto pausado
                 atualizarLista(); 
             });
         }
         
-        // NOVO: Função para Continuar o Sorteio
+        // Função para Continuar o Sorteio
         function continuarSorteio() {
             if (sorteioPausado && resolvePausa) {
                 sorteioPausado = false;
                 btnContinuar.style.display = 'none';
                 btnSortear.style.display = 'block';
-                resolvePausa(); // Libera a Promise de pausa
                 
-                // Reabilita controles
+                // Reabilita controles de adição/exclusão antes de liberar a Promise
                 document.querySelectorAll('.btn-acao').forEach(btn => btn.disabled = false);
                 document.querySelectorAll('.btn-excluir').forEach(btn => btn.disabled = false);
                 novoNomeInput.disabled = false;
-                numVencedoresInput.disabled = false;
                 
                 atualizarLista();
+
+                // O fluxo de sorteio é reiniciado/continuado
+                resolvePausa(); 
             }
         }
         
@@ -623,34 +607,21 @@
             }, 250);
         }
 
-
         async function sortear() {
             if (audioContext.state === 'suspended') {
                 audioContext.resume();
             }
 
-            const numVencedoresTotal = parseInt(numVencedoresInput.value);
-            if (isNaN(numVencedoresTotal) || numVencedoresTotal < 1) {
-                alert(`O número de vencedores é inválido.`);
-                return;
-            }
-            
-            const vencedoresASortear = Math.min(numVencedoresTotal, nomes.length);
-            if (vencedoresASortear === 0) {
-                alert("A lista de candidatos está vazia. Impossível sortear.");
-                return;
-            }
-
-            // Desabilitar todos os botões durante o sorteio
-            document.querySelectorAll('.btn-acao, .input-area button').forEach(btn => btn.disabled = true);
-            novoNomeInput.disabled = true;
-            numVencedoresInput.disabled = true;
-            document.querySelectorAll('.btn-excluir').forEach(btn => btn.disabled = true);
-
-            for (let v = 0; v < vencedoresASortear; v++) {
-                if (nomes.length === 0) break;
+            while (nomes.length > 0) {
                 
-                resultadoEl.textContent = `Sorteando ${v + 1}º Vencedor...`;
+                // Desabilitar todos os botões no INÍCIO do sorteio (exceto os auxiliares que serão liberados por atualizarLista)
+                document.querySelectorAll('.btn-acao, .input-area button').forEach(btn => btn.disabled = true);
+                novoNomeInput.disabled = true;
+                document.querySelectorAll('.btn-excluir').forEach(btn => btn.disabled = true);
+
+                // --- SORTEIO DE 1 VENCEDOR ---
+                
+                resultadoEl.textContent = `Sorteando o ${nomesSorteados.length + 1}º Vencedor...`;
                 resultadoEl.classList.add('animacao-sorteio'); 
                 resultadoEl.classList.remove('vencedor');
 
@@ -670,7 +641,7 @@
                 
                 // Anuncia o Vencedor
                 nomeVencedor = nomes[indiceFinal]; 
-                resultadoEl.textContent = `🎉 VENCEDOR ${v + 1}º: ${nomeVencedor} 🎉`; // Destaque maior
+                resultadoEl.textContent = `🎉 ${nomeVencedor} 🎉`; 
                 resultadoEl.classList.remove('animacao-sorteio');
                 resultadoEl.classList.add('vencedor');
                 
@@ -681,50 +652,49 @@
                 const nomeIndex = nomes.indexOf(nomeVencedor); 
                 nomesSorteados.unshift(nomes.splice(nomeIndex, 1)[0]);
                 
+                // Chama atualizarLista para liberar os botões auxiliares (Imprimir/Resetar/Limpar)
                 atualizarLista(); 
                 
-                // Pausa após anunciar cada vencedor, se houver mais a sortear
-                if (v < vencedoresASortear - 1 && nomes.length > 0) {
-                    await waitForUserClick(); // Espera pelo clique no botão Continuar
-                } else {
-                    // Se for o último sorteado, apenas espera a animação de confete/música
-                    await sleep(4000); 
-                }
-            }
+                await sleep(4000); // Espera pela animação de confetes/música
 
-            // Finaliza, reabilita e limpa o estado
-            if (sorteioPausado) { 
-                continuarSorteio(); 
-            }
+                // --- PAUSA INTERATIVA ---
+                
+                // Se houver mais nomes, espera o clique para continuar
+                if (nomes.length > 0) {
+                    await waitForUserClick(); // Espera pelo clique no botão Continuar
+                } 
+                
+            } // FIM DO WHILE (Sorteio Contínuo)
+
+            // Finaliza quando a lista estiver vazia
+            
+            btnSortear.style.display = 'block'; // Volta o Sortear (embora desabilitado)
+            btnContinuar.style.display = 'none';
             
             resultadoEl.classList.remove('vencedor');
-            resultadoEl.textContent = "Aguardando sorteio...";
+            resultadoEl.textContent = "🥳 Sorteio Finalizado! Todos os candidatos foram sorteados.";
             
+            // Reabilita todos os controles (Adicionar/Resetar/Imprimir/Limpar)
             document.querySelectorAll('.btn-acao, .input-area button').forEach(btn => btn.disabled = false);
             novoNomeInput.disabled = false;
             novoNomeInput.value = '';
             novoNomeInput.focus();
-            
+
             atualizarLista();
         }
 
-        // --- Outras Funções (Sem Alteração Lógica) ---
-
-        /**
-         * Gera uma janela de impressão formatada para os nomes sorteados.
-         */
+        // --- Outras Funções (Sem Alteração) ---
+        
         function imprimirSorteados() {
             if (nomesSorteados.length === 0) {
                 alert("Não há nomes sorteados para imprimir.");
                 return;
             }
 
-            // Cria o conteúdo HTML para impressão
             let htmlContent = `
                 <h1>Lista Oficial de Vencedores (${new Date().toLocaleDateString('pt-BR')})</h1>
                 <ul>
             `;
-            // Percorre a lista de sorteados na ordem correta (primeiro sorteado ao último)
             for (let i = nomesSorteados.length - 1; i >= 0; i--) {
                 htmlContent += `<li>${nomesSorteados.length - i}º Vencedor: ${nomesSorteados[i]}</li>`;
             }
@@ -733,16 +703,11 @@
             const printContainer = document.querySelector('.print-container');
             printContainer.innerHTML = htmlContent;
             
-            // Oculta a interface do sorteio e mostra apenas o container de impressão para a função nativa
             window.print();
             
-            // Limpa o container após a impressão
             printContainer.innerHTML = '';
         }
         
-        /**
-         * Move todos os nomes da lista de Sorteados de volta para a lista de Candidatos.
-         */
         function resetarSorteadosParaCandidatos() {
             if (nomesSorteados.length === 0) {
                 alert("A lista de sorteados já está vazia. Não há nomes para resetar.");
@@ -750,18 +715,18 @@
             }
 
             if (confirm("ATENÇÃO: Deseja realmente mover TODOS os nomes sorteados de volta para a lista de Candidatos?")) {
-                // Adiciona todos os sorteados de volta aos candidatos
                 nomes = nomes.concat(nomesSorteados); 
-                
-                // Limpa a lista de sorteados
                 nomesSorteados = [];
                 
+                btnSortear.style.display = 'block';
+                btnContinuar.style.display = 'none';
+                resultadoEl.textContent = "Aguardando sorteio...";
+
                 atualizarLista();
                 alert("Os nomes sorteados foram resetados e estão de volta à lista de candidatos.");
             }
         }
 
-        // Função de Capitalização: garante que o nome fique com a primeira letra de cada palavra maiúscula.
         function capitalizeName(name) {
             return name.toLowerCase().split(' ').map(word => {
                 if (word.length > 0) {
@@ -804,6 +769,15 @@
             }
             if (confirm("Você tem certeza que deseja limpar toda a lista de Vencedores Sorteados (eles serão perdidos se não estiverem na lista de candidatos)?")) {
                 nomesSorteados = [];
+
+                if(nomes.length > 0) {
+                    btnSortear.style.display = 'block';
+                    btnContinuar.style.display = 'none';
+                    resultadoEl.textContent = "Aguardando sorteio...";
+                } else {
+                    resultadoEl.textContent = "Lista de candidatos vazia.";
+                }
+
                 atualizarLista();
                 alert("Lista de sorteados limpa com sucesso!");
             }
