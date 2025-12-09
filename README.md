@@ -1,31 +1,40 @@
-# 🏆 Sorteador Corporativo Simples (HTML/CSS/JS)
+# 🏆 Sorteador Sequencial Interativo
 
-Um aplicativo de sorteio de nomes robusto, que funciona em uma única página HTML, sem dependências externas (exceto para os confetes). Ideal para eventos internos, com animação, áudio do Tema da Vitória e persistência de dados.
+Este é um projeto simples de Front-End (HTML, CSS e JavaScript Vanilla) que implementa um sistema de sorteio corporativo com foco na **interatividade e controle manual** do fluxo de vencedores.
 
-## 🚀 Como Usar
-
-1.  **Baixe:** Salve o arquivo Sorteador de Nomes com .html (ex: `Sorteador de Nomes.html`).
-2.  **Abra:** Dê um duplo clique no arquivo para executá-lo no seu navegador.
-
-> **Nota:** Seus dados (candidatos e sorteados) são salvos automaticamente no seu navegador (`localStorage`).
+O código-fonte completo é composto por um único arquivo `.html` que contém toda a lógica e estilos.
 
 ---
 
-## ✨ Funcionalidades
+## ✨ Funcionalidade Principal: Sequencial Interativo
 
-| Ação | Descrição |
-| :--- | :--- |
-| **Sorteio Múltiplo** | Sorteia vários vencedores de uma vez com animação. |
-| **Persistência** | Mantém as listas salvas após fechar e reabrir o arquivo. |
-| **Tema da Vitória** | Toca uma melodia de celebração e lança confetes ao sortear. |
-| **`↩️ Voltar Nomes`** | Move todos os vencedores de volta para a lista de Candidatos (Reset). |
-| **`🖨️ Imprimir`** | Gera um formato limpo para imprimir a lista de vencedores. |
+O sistema foi desenhado para realizar sorteios **um a um**, permitindo que o apresentador ou operador controle o tempo entre a revelação de cada vencedor.
+
+1.  **Sorteio de 1 Vencedor:** Ao clicar em **"Sortear Vencedor"**, o sistema executa uma animação de rolagem rápida (com efeitos sonoros) e anuncia o ganhador com confetes.
+2.  **Pausa Obrigatória:** Após revelar o vencedor, o sorteio **pausa automaticamente**. O nome do ganhador é fixado na área de resultado para visualização.
+3.  **Continuação Manual:** O botão **"Sortear Vencedor"** é substituído por **"Continuar Sorteio"**. O sorteio só prossegue para o próximo nome quando o usuário clica neste botão.
+4.  **Exclusão Imediata:** Cada nome sorteado é movido instantaneamente da lista **"Candidatos"** para a lista **"Sorteados"** (Vencedores).
+
+O processo é repetido sequencialmente até que a lista de Candidatos esteja vazia.
 
 ---
 
-## 💻 Estrutura Técnica
+## 💾 Persistência e Controles
 
-O projeto utiliza puramente **HTML, CSS e JavaScript Vanilla**.
+O sistema utiliza o **`localStorage`** do navegador para garantir que os dados das listas de Candidatos e Sorteados não sejam perdidos ao recarregar a página.
 
-* O JavaScript usa a **Web Audio API** para gerar os sons dinamicamente.
-* O gerenciamento de dados é feito com **`localStorage`**.
+### Controles de Lista (Sempre Ativos)
+
+Os botões auxiliares de gerenciamento de listas permanecem **ativos** mesmo durante a pausa interativa do sorteio (após um vencedor ser revelado), permitindo ações administrativas a qualquer momento:
+
+| Botão | Função | Estado durante a Pausa |
+| :--- | :--- | :--- |
+| **Imprimir Vencedores** | Abre a janela de impressão com a lista formatada dos sorteados. | **ATIVO** |
+| **Voltar Nomes p/ Sorteio** | Move **todos** os nomes da lista de Sorteados de volta para a lista de Candidatos. | **ATIVO** |
+| **Limpar Sorteados** | Esvazia a lista de Sorteados. | **ATIVO** |
+| **Adicionar/Excluir** | Adicionar um novo nome ou excluir um candidato existente. | **BLOQUEADO** (Apenas durante a pausa ou rolagem, para proteger a integridade do sorteio em andamento). |
+
+---
+Para usalo basta salvar o codigo em html e abrir com o navegador
+
+## ⚙
