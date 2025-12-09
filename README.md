@@ -1,40 +1,49 @@
-# 🏆 Sorteador Sequencial Interativo
+# 🏆 Sorteador Corporativo - Documentação
 
-Este é um projeto simples de Front-End (HTML, CSS e JavaScript Vanilla) que implementa um sistema de sorteio corporativo com foco na **interatividade e controle manual** do fluxo de vencedores.
+Olá Dr. Hasegawa. Este documento serve como guia para a estrutura e funcionalidades do sistema de sorteio corporativo, desenvolvido em um único arquivo HTML para máxima portabilidade e uso simplificado ("download-e-execute").
 
-O código-fonte completo é composto por um único arquivo `.html` que contém toda a lógica e estilos.
+## 🚀 Uso Simplificado
 
----
+Basta baixar o arquivo `index.html` e abri-lo diretamente em qualquer navegador moderno. Todo o código (HTML, CSS e JavaScript) está contido internamente.
 
-## ✨ Funcionalidade Principal: Sequencial Interativo
+## ✨ Funcionalidades Principais
 
-O sistema foi desenhado para realizar sorteios **um a um**, permitindo que o apresentador ou operador controle o tempo entre a revelação de cada vencedor.
+| Funcionalidade | Detalhe |
+| :--- | :--- |
+| **Sorteio em Tela Cheia** | Ativado pelo botão "INICIAR SORTEIO", usando uma interface dedicada para visualização em telões. |
+| **Animação Aleatória (Fade)** | Utiliza o `keyframes fadeRoll` para um efeito de oscilação (`opacity`) suave durante a rolagem de nomes. |
+| **Persistência de Dados** | Listas de Candidatos, Sorteados e Log são salvas automaticamente no `LocalStorage` do navegador. |
+| **Importação de Nomes** | Permite carregar listas de nomes via arquivo `.txt` ou `.csv` (um nome por linha). |
+| **Gerenciamento de Listas** | Funções de adição individual, exclusão de itens e botões de **Limpar Candidatos** e **Resetar Sorteados**. |
+| **Modo Automático** | Sorteia repetidamente em um intervalo definido até que a lista de candidatos se esgote. |
+| **Exportação e Impressão** | Exporta o histórico de sorteios para CSV e permite imprimir a lista de vencedores. |
+| **Controle por Teclado** | Teclas **ESPAÇO** para sortear e **ESC** para sair da tela cheia. |
 
-1.  **Sorteio de 1 Vencedor:** Ao clicar em **"Sortear Vencedor"**, o sistema executa uma animação de rolagem rápida (com efeitos sonoros) e anuncia o ganhador com confetes.
-2.  **Pausa Obrigatória:** Após revelar o vencedor, o sorteio **pausa automaticamente**. O nome do ganhador é fixado na área de resultado para visualização.
-3.  **Continuação Manual:** O botão **"Sortear Vencedor"** é substituído por **"Continuar Sorteio"**. O sorteio só prossegue para o próximo nome quando o usuário clica neste botão.
-4.  **Exclusão Imediata:** Cada nome sorteado é movido instantaneamente da lista **"Candidatos"** para a lista **"Sorteados"** (Vencedores).
+## 📐 Estrutura Interna do Código (`index.html`)
 
-O processo é repetido sequencialmente até que a lista de Candidatos esteja vazia.
+Para facilitar a manutenção e por ser um arquivo único, o código é organizado na seguinte sequência:
 
----
+### 1. HTML (`<body>`)
+* **Contêiner Principal (`.container`):** Layout da interface de controle.
+* **Overlay de Sorteio (`#tela-cheia-overlay`):** Camada de visualização em tela cheia.
+* **Bloco `<script>`:** Posicionado antes do fechamento do `</body>` para garantir o carregamento do DOM.
 
-## 💾 Persistência e Controles
+### 2. Estilos CSS (`<style>`)
+* **Configurações Globais:** Definição de cores e temas via variáveis CSS (`:root` e `.tema-escuro`).
+* **Animação do Sorteio:** O bloco `@keyframes fadeRoll` é o responsável pelo efeito visual no texto durante o sorteio.
 
-O sistema utiliza o **`localStorage`** do navegador para garantir que os dados das listas de Candidatos e Sorteados não sejam perdidos ao recarregar a página.
+### 3. Lógica JavaScript (`<script>`)
 
-### Controles de Lista (Sempre Ativos)
+O código JS está segmentado por blocos de comentários para clareza:
 
-Os botões auxiliares de gerenciamento de listas permanecem **ativos** mesmo durante a pausa interativa do sorteio (após um vencedor ser revelado), permitindo ações administrativas a qualquer momento:
-
-| Botão | Função | Estado durante a Pausa |
+| Bloco | Responsabilidade | Funções Chave |
 | :--- | :--- | :--- |
-| **Imprimir Vencedores** | Abre a janela de impressão com a lista formatada dos sorteados. | **ATIVO** |
-| **Voltar Nomes p/ Sorteio** | Move **todos** os nomes da lista de Sorteados de volta para a lista de Candidatos. | **ATIVO** |
-| **Limpar Sorteados** | Esvazia a lista de Sorteados. | **ATIVO** |
-| **Adicionar/Excluir** | Adicionar um novo nome ou excluir um candidato existente. | **BLOQUEADO** (Apenas durante a pausa ou rolagem, para proteger a integridade do sorteio em andamento). |
+| **Persistência** | Carregar/Salvar dados do `LocalStorage`. | `carregarJSON()`, `salvarJSON()` |
+| **Utilidade** | Sons e Auxiliares. | `playClickBeep()`, `playWinnerMelody()`, `sleep()` |
+| **CRUD & Renderização** | Manipulação das listas e interface. | `atualizarLista()`, `adicionarNome()` |
+| **Novas Funções** | Importação e Limpeza de Massa. | `importarNomes()`, `limparCandidatos()` |
+| **Sorteio Principal** | Lógica do sorteio e animação. | `realizarRodadaDeSorteio()`, `iniciarSorteio()` |
+| **Eventos** | Conexão entre o código e o usuário. | `addEventListener` para todos os botões e eventos de teclado. |
 
 ---
-Para usalo basta baixar o documeto e salvar com .html e abrir com o navegador
-
-## ⚙
+*Documentação gerada em 09 de Dezembro de 2025.*
