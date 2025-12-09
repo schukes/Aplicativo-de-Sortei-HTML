@@ -4,7 +4,7 @@ Olá Dr. Hasegawa. Este documento serve como guia para a estrutura e funcionalid
 
 ## 🚀 Uso Simplificado
 
-Basta baixar o arquivo `index.html` e abri-lo diretamente em qualquer navegador moderno. Todo o código (HTML, CSS e JavaScript) está contido internamente.
+Basta baixar o arquivo `Sorteador de Nomes` salvar com .html e abri-lo diretamente em qualquer navegador moderno. Todo o código (HTML, CSS e JavaScript) está contido internamente.
 
 ## ✨ Funcionalidades Principais
 
