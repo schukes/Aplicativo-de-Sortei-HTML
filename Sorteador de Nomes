@@ -2,22 +2,31 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>Sorteio Corporativo - Sequencial Interativo</title>
+    <title>Sorteio Corporativo - Tela Cheia</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
 
-        /* --- Variáveis de Tema (Dr Hasegawa) --- */
-        :root { 
-            --cor-primaria: #388E3C; 
-            --cor-secundaria: #66BB6A; 
-            --cor-fundo: #E8F5E9; 
+        :root {
+            --cor-primaria: #388E3C;
+            --cor-secundaria: #66BB6A;
+            --cor-fundo: #E8F5E9;
             --cor-texto: #2E3A42;
-            --cor-fundo-card: #fff;
+            --cor-fundo-card: #ffffff;
             --cor-excluir: #E53935;
-            --cor-aviso: #FF9800; 
-            --cor-imprimir: #42A5F5; 
+            --cor-aviso: #FF9800;
+            --cor-imprimir: #42A5F5;
+            --cor-continuar: #4CAF50;
+            --cor-borda: #C8E6C9;
+        }
+
+        body.tema-escuro {
+            --cor-primaria: #1B5E20;
+            --cor-secundaria: #43A047;
+            --cor-fundo: #102117;
+            --cor-texto: #E0E0E0;
+            --cor-fundo-card: #1E2722;
+            --cor-borda: #2E7D32;
         }
 
         body {
@@ -34,28 +43,72 @@
 
         .container {
             background: var(--cor-fundo-card);
-            padding: 30px 40px;
+            padding: 25px 30px;
             border-radius: 18px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-            max-width: 950px; 
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            max-width: 1100px;
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
+        }
+
+        .topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
         }
 
         h1 {
-            margin-bottom: 5px;
+            margin: 0;
             font-weight: 900;
             color: var(--cor-primaria);
             border-bottom: 3px solid var(--cor-secundaria);
-            padding-bottom: 10px;
-            font-size: 2em; 
+            padding-bottom: 8px;
+        }
+
+        .btn-tema {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            background: var(--cor-primaria);
+            color: #fff;
+        }
+
+        .progress-container {
+            margin-top: 8px;
+            background: var(--cor-fundo);
+            border-radius: 10px;
+            border: 1px solid var(--cor-borda);
+            overflow: hidden;
+            position: relative;
+            height: 20px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--cor-secundaria), var(--cor-primaria));
+            transition: width 0.3s ease;
+        }
+
+        .progress-label {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #1b1b1b;
         }
 
         .content-wrapper {
             display: flex;
-            gap: 30px;
+            gap: 20px;
         }
 
         .lista-secao {
@@ -63,10 +116,10 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         h2 {
-            font-size: 1.2em;
-            margin-bottom: 10px;
+            font-size: 1.1em;
+            margin: 0 0 8px;
             color: var(--cor-primaria);
             font-weight: 700;
         }
@@ -75,8 +128,8 @@
             background: var(--cor-fundo);
             border: 1px solid var(--cor-secundaria);
             border-radius: 10px;
-            padding: 10px 15px;
-            font-size: 15px;
+            padding: 8px 12px;
+            font-size: 14px;
             color: var(--cor-texto);
             height: 200px;
             overflow-y: auto;
@@ -85,23 +138,17 @@
             flex-grow: 1;
         }
 
-        .lista-box ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
+        .lista-box ul { list-style: none; margin: 0; padding: 0; }
 
         .lista-box li {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
+            padding: 4px 0;
             border-bottom: 1px dashed #ccc;
         }
 
-        .lista-box li:last-child {
-            border-bottom: none;
-        }
+        .lista-box li:last-child { border-bottom: none; }
 
         .btn-excluir {
             background: none;
@@ -109,769 +156,835 @@
             color: var(--cor-excluir);
             font-weight: 700;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 0.9em;
             padding: 0 5px;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-
-        .btn-excluir:hover {
-            opacity: 1;
-            color: #d32f2f;
         }
 
         .input-area {
             display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
         }
 
         .input-area input[type="text"] {
             flex: 1;
-            padding: 12px 18px;
-            font-size: 16px;
+            padding: 8px 10px;
+            font-size: 14px;
             border-radius: 8px;
             border: 1px solid #ccc;
             outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-
-        .input-area input[type="text"]:focus {
-            border-color: var(--cor-secundaria);
-            box-shadow: 0 0 5px rgba(102, 187, 106, 0.8);
+        
+        .input-area input[type="file"] {
+            /* Estilo para garantir que o input de arquivo funcione bem */
+            line-height: 24px; 
         }
 
         .input-area button,
         button.btn-acao {
             color: white;
             border: none;
-            padding: 12px 25px;
-            font-size: 16px;
+            padding: 10px 18px;
+            font-size: 14px;
             font-weight: 700;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            outline: none;
-            user-select: none;
         }
         
-        .input-area button {
-            background-color: var(--cor-secundaria);
+        /* COR AZUL PARA O BOTÃO ADICIONAR */
+        #btnAdicionar {
+            background-color: var(--cor-imprimir); 
         }
 
-        .input-area button:hover {
-            background-color: #5aa75e;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .input-area button:disabled,
-        button.btn-acao:disabled {
-            background-color: #a5d6a7;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-        
-        .controles-sorteio { display: none; }
-
-        button#btnSortear {
+        #btnSortear {
             background-color: var(--cor-primaria);
-            margin-top: 15px;
-            padding: 15px 40px;
-            font-size: 20px;
-            box-shadow: 0 8px 20px rgba(56, 142, 60, 0.5);
-            flex-grow: 2;
+            font-size: 18px;
         }
 
-        button#btnSortear:hover {
-            background-color: #317a35;
-            box-shadow: 0 10px 25px rgba(49, 122, 53, 0.7);
-        }
-        
+        #btnImprimirSorteados { background-color: var(--cor-imprimir); }
+        #btnResetarSorteados { background-color: var(--cor-aviso); }
+        #btnLimparSorteados { background-color: var(--cor-excluir); }
+        #btnExportarCSV { background-color: var(--cor-continuar); }
+
         .area-botoes-principais {
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap; 
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        
-        .area-botoes-principais button {
-            margin-top: 15px;
-            flex-grow: 1; 
-        }
-
-        #btnImprimirSorteados {
-            background-color: var(--cor-imprimir);
-        }
-        
-        #btnImprimirSorteados:hover {
-            background-color: #3895e0;
-        }
-
-        #btnResetarSorteados {
-            background-color: var(--cor-aviso);
-        }
-        
-        #btnResetarSorteados:hover {
-            background-color: #e68900;
-        }
-        
-        #btnLimparSorteados {
-            background-color: var(--cor-excluir);
-        }
-        
-        #btnLimparSorteados:hover {
-            background-color: #c62828;
-        }
-
 
         .resultado {
-            margin-top: 20px;
-            font-size: 48px; 
-            font-weight: 900;
-            color: var(--cor-texto);
-            background: #fff;
-            padding: 15px 20px;
-            border: 4px solid var(--cor-primaria);
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(56, 142, 60, 0.6);
-            min-height: 50px;
+            margin-top: 6px;
+            font-size: 14px;
+            font-weight: 700;
             text-align: center;
-            user-select: none;
-            animation: none;
-        }
-        
-        .resultado.animacao-sorteio {
-            font-size: 36px;
-            animation: rollEffect 0.08s infinite alternate;
-        }
-        
-        @keyframes rollEffect {
-            0% { transform: scale(1.0); color: var(--cor-texto); }
-            100% { transform: scale(1.03); color: var(--cor-primaria); }
         }
 
-        .resultado.vencedor {
-            font-size: 48px;
-            background-color: #f1f8e9;
-            border-color: var(--cor-primaria);
-            color: var(--cor-primaria);
-            animation: winnerGlow 1.5s ease-out 3;
+        .linha-auto {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .linha-auto input[type="number"] {
+            width: 60px;
+            padding: 4px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .log-box {
+            margin-top: 10px;
+            font-size: 12px;
+            max-height: 120px;
+            overflow-y: auto;
+            border-top: 1px dashed #ccc;
+            padding-top: 6px;
+        }
+
+        .log-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .log-box li {
+            padding: 2px 0;
+        }
+
+        /* --- TELA CHEIA (AJUSTES) --- */
+        #tela-cheia-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: radial-gradient(circle at top, #1b5e20 0, #000 60%);
+            z-index: 9999;
+            color: #fff;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .overlay-inner {
+            /* Ajustado após remover a sidebar */
+            display: block; 
+            width: 90vw;
+            max-width: 1400px;
+            gap: 20px;
+        }
+
+        .overlay-main {
+            /* Ajustado para ocupar o espaço total */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #texto-sorteio-fullscreen {
+            font-size: 7vw;
+            font-weight: 900;
+            padding: 20px;
+            line-height: 1.1;
+            text-shadow: 0 0 25px rgba(102, 187, 106, 0.9);
         }
         
-        @keyframes winnerGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(56, 142, 60, 0.6); }
-            50% { box-shadow: 0 0 35px rgba(102, 187, 106, 1); }
+        /* NOVA ANIMAÇÃO DE FADE/PISCADA */
+        .animacao-sorteio-fs {
+            animation: fadeRoll 0.1s linear infinite;
         }
-        
-        /* Estilos de Impressão */
+
+        @keyframes fadeRoll {
+            0%   { opacity: 0.2; }
+            50%  { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+
+        .zoom-vencedor {
+            animation: zoomWinner 0.8s ease-out forwards;
+        }
+
+        @keyframes zoomWinner {
+            0% { transform: scale(0.8); opacity: 0.3; }
+            60% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        .btn-fechar-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 22px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .subtitulo-overlay {
+            font-size: 1.6vw;
+            color: #C8E6C9;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .contador-overlay {
+            font-size: 1vw;
+            color: #A5D6A7;
+            margin-bottom: 10px;
+        }
+
+        .instrucao-overlay {
+            margin-top: 12px;
+            font-size: 0.9vw;
+            color: #c8e6c9;
+            font-weight: 700;
+            display: none;
+        }
+
+        .botoes-overlay {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-overlay-acao {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        #btnProximoOverlay {
+            background: #43A047;
+            color: #fff;
+        }
+
+        #btnProximoOverlay:disabled {
+            background: #2e7d32;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #btnPararAutoOverlay {
+            background: #E53935;
+            color: #fff;
+        }
+
         @media print {
-            body > *:not(.print-container) {
-                display: none;
-            }
+            body > *:not(.print-container) { display: none; }
             .print-container {
                 display: block !important;
                 position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                margin: 0;
-                padding: 20px;
-                background-color: white;
-                color: black;
+                left: 0; top: 0; width: 100%;
+                margin: 0; padding: 20px;
+                background-color: white; color: black;
                 font-family: 'Arial', sans-serif;
             }
-            .print-container h1 {
-                border-bottom: 2px solid #ccc;
-                padding-bottom: 10px;
-                color: black;
-                font-size: 24pt;
-            }
-            .print-container ul {
-                list-style: decimal;
-                padding-left: 20px;
-            }
-            .print-container li {
-                padding: 5px 0;
-                border-bottom: 1px dotted #ccc;
-                font-size: 14pt;
-            }
+            .print-container h1 { border-bottom: 2px solid #ccc; padding-bottom: 10px; font-size: 24pt; }
+            .print-container li { padding: 5px 0; border-bottom: 1px dotted #ccc; font-size: 14pt; }
         }
-        
-        /* 📱 AJUSTES DE RESPONSIVIDADE PARA SMARTPHONES (Redmi, etc.) 📱 */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-                height: auto; 
-                min-height: 100vh;
-            }
-            
-            .container {
-                padding: 15px;
-                gap: 15px;
-                width: 100%;
-                max-width: 600px; 
-            }
-            
-            h1 {
-                font-size: 1.8em;
-                padding-bottom: 5px;
-            }
-
-            .content-wrapper {
-                flex-direction: column; 
-                gap: 20px;
-            }
-            
-            .lista-secao {
-                width: 100%; 
-            }
-            
-            .lista-box {
-                height: 150px; 
-            }
-
-            .resultado {
-                font-size: 30px; 
-                padding: 15px;
-            }
-            
-            .resultado.vencedor {
-                font-size: 32px;
-            }
-
-            button#btnSortear {
-                font-size: 18px;
-                padding: 12px 20px;
-            }
-            
-            .area-botoes-principais {
-                gap: 10px;
-            }
-            
-            .input-area {
-                 flex-wrap: wrap;
-                 gap: 5px;
-            }
-            
-            .input-area input[type="text"], 
-            .input-area button {
-                padding: 10px 15px;
-            }
-
-            .area-botoes-principais button {
-                 flex-basis: calc(50% - 5px); 
-            }
-
-            button#btnSortear, 
-            button#btnContinuar {
-                flex-basis: 100%;
-            }
-        }
-        /* 📱 FIM DOS AJUSTES DE RESPONSIVIDADE 📱 */
-        
     </style>
 </head>
 <body>
+
+    <div id="tela-cheia-overlay">
+        <button class="btn-fechar-overlay" id="btnFecharOverlay">✕</button>
+
+        <div class="overlay-inner">
+            <div class="overlay-main">
+                <div class="subtitulo-overlay" id="subtitulo-overlay">Sorteando...</div>
+                <div class="contador-overlay" id="contadorOverlay"></div>
+                <div id="texto-sorteio-fullscreen">Nome</div>
+                <div class="botoes-overlay">
+                    <button id="btnProximoOverlay" class="btn-overlay-acao">Próximo</button>
+                    <button id="btnPararAutoOverlay" class="btn-overlay-acao" style="display:none;">Parar Auto</button>
+                </div>
+                <div class="instrucao-overlay" id="instrucaoContinuar">Aperte ESPAÇO para o próximo sorteio.</div>
+            </div>
+
+            </div>
+    </div>
+
     <div class="container">
-        <h1>🏆 Sorteio Corporativo</h1>
+        <div class="topo">
+            <h1>🏆 Sorteio Corporativo</h1>
+            <button id="btnTema" class="btn-tema">Alternar Tema Claro/Escuro</button>
+        </div>
+
+        <div class="progress-container">
+            <div id="progressBar" class="progress-bar"></div>
+            <div id="progressLabel" class="progress-label">0 / 0 sorteados</div>
+        </div>
 
         <div class="content-wrapper">
             <div class="lista-secao">
                 <h2>Candidatos (Total: <span id="contadorCandidatos"></span>)</h2>
-                <div class="lista-box" id="listaNomes">
-                    </div>
+                <div class="lista-box" id="listaNomes"></div>
 
                 <div class="input-area">
                     <input type="text" id="novoNome" placeholder="Adicionar novo nome" />
                     <button id="btnAdicionar">Adicionar</button>
                 </div>
-            </div>
+                
+                <div class="input-area" style="margin-top: 10px;">
+                    <input type="file" id="arquivoNomes" accept=".txt, .csv" style="flex: 1; padding: 4px;"/>
+                    <button id="btnImportar" class="btn-acao" style="background-color: var(--cor-secundaria);">Importar Lista</button>
+                    <button id="btnLimparCandidatos" class="btn-acao" style="background-color: var(--cor-excluir);">🗑️ Limpar Candidatos</button>
+                </div>
+                </div>
 
             <div class="lista-secao">
                 <h2>Sorteados (Vencedores)</h2>
-                <div class="lista-box" id="listaSorteados">
-                    </div>
+                <div class="lista-box" id="listaSorteados"></div>
             </div>
         </div>
-        
-        <div class="controles-sorteio" style="display: none;">
-             <label for="numVencedores">Sortear:</label>
-             <input type="number" id="numVencedores" value="1" min="1" max="10" />
-             <label for="numVencedores">vencedor(es) no total</label>
-        </div>
-        
+
         <div class="area-botoes-principais">
-            <button id="btnSortear" class="btn-acao">Sortear Vencedor</button>
-            <button id="btnContinuar" class="btn-acao" style="background-color: #007bff; display: none;">Continuar Sorteio</button> 
+            <button id="btnSortear" class="btn-acao">INICIAR SORTEIO EM TELA CHEIA</button>
             <button id="btnImprimirSorteados" class="btn-acao">🖨️ Imprimir Vencedores</button>
+            <button id="btnExportarCSV" class="btn-acao">📄 Exportar CSV</button>
             <button id="btnResetarSorteados" class="btn-acao">↩️ Voltar Nomes p/ Sorteio</button>
-            <button id="btnLimparSorteados" class="btn-acao">Limpar Sorteados</button>
+            <button id="btnLimparSorteados" class="btn-acao">Excluir Sorteados</button>
         </div>
 
-        <div class="resultado" id="resultado">Aguardando sorteio...</div>
+        <div class="linha-auto">
+            <label>
+                <input type="checkbox" id="chkAuto" />
+                Modo automático (sorteia até acabar)
+            </label>
+            <label>
+                Intervalo (segundos):
+                <input type="number" id="intervaloAuto" min="1" max="60" value="5" />
+            </label>
+        </div>
+
+        <div class="resultado" id="resultado">Aguardando início...</div>
+
+        <div class="log-box">
+            <strong>Log de sorteios (data/hora):</strong>
+            <ul id="logSorteios"></ul>
+        </div>
     </div>
-    
-    <div class="print-container" style="display: none;"></div>
+
+    <div class="print-container" style="display:none;"></div>
 
     <script>
-        // Funções de Persistência
-        function carregarNomes(key, defaultValue) {
+        // Persistência
+        function carregarJSON(key, def) {
             try {
-                const stored = localStorage.getItem(key);
-                return stored ? JSON.parse(stored) : defaultValue;
-            } catch (e) {
-                console.error("Erro ao carregar dados do localStorage", e);
-                return defaultValue;
+                const d = localStorage.getItem(key);
+                return d ? JSON.parse(d) : def;
+            } catch {
+                return def;
             }
         }
-        
-        function salvarNomes(key, data) {
+        function salvarJSON(key, value) {
             try {
-                localStorage.setItem(key, JSON.stringify(data));
-            } catch (e) {
-                console.error("Erro ao salvar dados no localStorage", e);
-            }
+                localStorage.setItem(key, JSON.stringify(value));
+            } catch { }
         }
-        
-        // Inicialização de Dados com Persistência
-        let nomes = carregarNomes('sorteio_candidatos', [
+
+        let nomes = carregarJSON('sorteio_candidatos', [
             "Felipe Martins", "Tiago Guedes", "Leticia", "Rodrigo", "Isadora",
             "Camila Beatriz", "Fernando", "Tiago Hasegawa", "Yasmim"
         ]);
-        let nomesSorteados = carregarNomes('sorteio_sorteados', []);
-        
-        // --- Variáveis de Controle de Pausa ---
-        let sorteioPausado = false; 
-        let resolvePausa; 
-        // --- FIM Variáveis de Controle de Pausa ---
+        let nomesSorteados = carregarJSON('sorteio_sorteados', []);
+        let logSorteios = carregarJSON('sorteio_log', []);
 
-        // Contexto de Áudio para geração de som
+        let isSorteando = false;
+        let autoMode = false;
+        let autoTimeoutId = null;
+
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // --- Referências de Elementos ---
+
+        // DOM principais
         const listaNomesEl = document.getElementById('listaNomes');
         const listaSorteadosEl = document.getElementById('listaSorteados');
-        const resultadoEl = document.getElementById('resultado');
-        const btnSortear = document.getElementById('btnSortear');
-        const novoNomeInput = document.getElementById('novoNome');
-        const btnAdicionar = document.getElementById('btnAdicionar');
         const contadorCandidatosEl = document.getElementById('contadorCandidatos');
+        const resultadoEl = document.getElementById('resultado');
+        const novoNomeInput = document.getElementById('novoNome');
+        
+        // DOM NOVOS
+        const arquivoNomesInput = document.getElementById('arquivoNomes');
+        const btnImportar = document.getElementById('btnImportar');
+        const btnLimparCandidatos = document.getElementById('btnLimparCandidatos'); // NOVO BOTÃO
+
+        const overlayEl = document.getElementById('tela-cheia-overlay');
+        const textoFullscreenEl = document.getElementById('texto-sorteio-fullscreen');
+        const btnFecharOverlayEl = document.getElementById('btnFecharOverlay');
+        const subtituloOverlayEl = document.getElementById('subtitulo-overlay');
+        const instrucaoContinuarEl = document.getElementById('instrucaoContinuar');
+        const contadorOverlayEl = document.getElementById('contadorOverlay');
+        const btnProximoOverlay = document.getElementById('btnProximoOverlay');
+        const btnPararAutoOverlay = document.getElementById('btnPararAutoOverlay');
+
+        const btnSortear = document.getElementById('btnSortear');
+        const btnAdicionar = document.getElementById('btnAdicionar');
         const btnLimparSorteados = document.getElementById('btnLimparSorteados');
         const btnImprimirSorteados = document.getElementById('btnImprimirSorteados');
         const btnResetarSorteados = document.getElementById('btnResetarSorteados');
-        const btnContinuar = document.getElementById('btnContinuar'); 
+        const btnExportarCSV = document.getElementById('btnExportarCSV');
+        const btnTema = document.getElementById('btnTema');
+        const chkAuto = document.getElementById('chkAuto');
+        const intervaloAutoInput = document.getElementById('intervaloAuto');
 
+        const progressBarEl = document.getElementById('progressBar');
+        const progressLabelEl = document.getElementById('progressLabel');
+        const logSorteiosEl = document.getElementById('logSorteios');
 
-        // --- Funções de Som (Sem Alteração) ---
-        
+        function getTotalAtual() {
+            return nomes.length + nomesSorteados.length;
+        }
+
+        // Sons
         function playClickBeep(delay = 0) {
             if (audioContext.state === 'suspended') return;
-
-            const frequency = 700;
-            const duration = 0.05;
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-
-            oscillator.type = 'sawtooth';
-            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime + delay);
-
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + delay);
-            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + delay + duration);
-
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-
-            oscillator.start(audioContext.currentTime + delay);
-            oscillator.stop(audioContext.currentTime + delay + duration);
+            const osc = audioContext.createOscillator();
+            const g = audioContext.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(850, audioContext.currentTime + delay);
+            g.gain.setValueAtTime(0.3, audioContext.currentTime + delay);
+            g.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + delay + 0.05);
+            osc.connect(g); g.connect(audioContext.destination);
+            osc.start(audioContext.currentTime + delay);
+            osc.stop(audioContext.currentTime + delay + 0.05);
         }
 
         function playWinnerMelody() {
             if (audioContext.state === 'suspended') return;
-            
-            const C5 = 523.25; const D5 = 587.33; const E5 = 659.25; 
-            const G5 = 783.99; const A5 = 880.00; const C6 = 1046.5; 
-            
-            let time = audioContext.currentTime;
-            
-            function playNote(freq, start, dur, volume, waveType = 'square') {
+            const seq = [
+                { f: 523.25, d: 0.12 }, { f: 659.25, d: 0.12 },
+                { f: 783.99, d: 0.15 }, { f: 987.77, d: 0.2 },
+                { f: 1174.66, d: 0.25 }
+            ];
+            let t = audioContext.currentTime;
+            seq.forEach(({ f, d }, i) => {
                 const osc = audioContext.createOscillator();
-                const gain = audioContext.createGain();
+                const g = audioContext.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(f, t);
+                g.gain.setValueAtTime(0.18, t);
+                g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+                osc.connect(g); g.connect(audioContext.destination);
+                osc.start(t);
+                osc.stop(t + d);
+                t += d * 0.9;
+            });
 
-                osc.type = waveType;
-                osc.frequency.setValueAtTime(freq, start);
-                
-                gain.gain.setValueAtTime(0, start); 
-                gain.gain.linearRampToValueAtTime(volume * 1.5, start + 0.03);
-                gain.gain.linearRampToValueAtTime(volume, start + dur * 0.4);
-                gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
-
-                osc.connect(gain);
-                gain.connect(audioContext.destination);
-
-                osc.start(start);
-                osc.stop(start + dur);
-            }
-            
-            const quarter = 0.3; 
-            const dottedQuarter = quarter * 1.5; 
-            const eighth = quarter * 0.5; 
-            const vol = 0.5;
-            
-            // Melodia
-            playNote(C5, time, dottedQuarter, vol);
-            playNote(D5, time + dottedQuarter, eighth, vol);
-            time += (dottedQuarter + eighth);
-            
-            playNote(E5, time, dottedQuarter, vol);
-            playNote(D5, time + dottedQuarter, eighth, vol);
-            time += (dottedQuarter + eighth);
-
-            playNote(C5, time, dottedQuarter, vol);
-            playNote(D5, time + dottedQuarter, eighth, vol);
-            time += (dottedQuarter + eighth);
-
-            playNote(E5, time, dottedQuarter, vol);
-            playNote(G5, time + dottedQuarter, eighth, vol);
-            time += (dottedQuarter + eighth);
-            
-            playNote(C6, time, quarter, vol * 1.2, 'sine'); time += quarter;
-            playNote(A5, time, quarter, vol * 1.2, 'sine'); time += quarter;
-            playNote(G5, time, quarter, vol * 1.2, 'sine'); time += quarter;
-            playNote(E5, time, quarter, vol * 1.2, 'sine'); time += quarter;
-            
-            playNote(C6, time, 1.2, vol * 1.5, 'triangle'); 
-            playNote(E5, time, 1.2, vol * 1.5, 'triangle');
-            playNote(G5, time, 1.2, vol * 1.5, 'triangle');
-            
-            time += 1.2;
+            // "batida" grave
+            const bass = audioContext.createOscillator();
+            const gb = audioContext.createGain();
+            bass.type = 'sine';
+            bass.frequency.setValueAtTime(110, audioContext.currentTime);
+            gb.gain.setValueAtTime(0.4, audioContext.currentTime);
+            gb.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.4);
+            bass.connect(gb); gb.connect(audioContext.destination);
+            bass.start();
+            bass.stop(audioContext.currentTime + 0.4);
         }
 
+        // Auxiliares
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-        // --- Funções de Lógica e Renderização ---
+        function atualizarProgresso() {
+            const total = getTotalAtual();
+            const sorteados = nomesSorteados.length;
+            const pct = total > 0 ? (sorteados / total) * 100 : 0;
+            progressBarEl.style.width = pct + '%';
+            progressLabelEl.textContent = `${sorteados} / ${total} sorteados`;
+        }
+
+        function atualizarLogVisual() {
+            logSorteiosEl.innerHTML = '';
+            logSorteios.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `${item.ordem}º - ${item.nome} (${item.dataHora})`;
+                logSorteiosEl.appendChild(li);
+            });
+        }
 
         function atualizarLista() {
             nomes.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
             const ulNomes = document.createElement('ul');
             nomes.forEach(nome => {
                 const li = document.createElement('li');
-                li.innerHTML = `
-                    <span>${nome}</span>
-                    <button class="btn-excluir" data-nome="${nome}">X</button>
-                `;
+                li.innerHTML = `<span>${nome}</span><button class="btn-excluir" data-nome="${nome}">X</button>`;
                 ulNomes.appendChild(li);
             });
             listaNomesEl.innerHTML = '';
             listaNomesEl.appendChild(ulNomes);
-            
-            // Adicionar event listeners para os botões de exclusão
+
             document.querySelectorAll('.btn-excluir').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const nomeParaExcluir = e.currentTarget.getAttribute('data-nome');
-                    removerNome(nomeParaExcluir);
-                });
+                btn.addEventListener('click', () => removerNome(btn.getAttribute('data-nome')));
             });
 
-            // 2. Atualizar Lista de Sorteados
             const ulSorteados = document.createElement('ul');
             nomesSorteados.forEach((nome, index) => {
                 const li = document.createElement('li');
                 li.textContent = `${nomesSorteados.length - index}º: ${nome}`;
-                ulSorteados.prepend(li);
+                ulSorteados.appendChild(li);
             });
             listaSorteadosEl.innerHTML = '';
             listaSorteadosEl.appendChild(ulSorteados);
-            
-            // 3. Atualizar Contador e botões
+
             contadorCandidatosEl.textContent = nomes.length;
-            
-            // Determinar estados de bloqueio
-            const isDrawing = resultadoEl.classList.contains('animacao-sorteio'); // TRUE durante a rolagem de nomes
-            const isPaused = btnContinuar.style.display !== 'none'; // TRUE durante a pausa interativa
 
-            // Botão Sortear principal é desabilitado se a lista estiver vazia ou se estiver em sorteio/pausa
-            btnSortear.disabled = nomes.length === 0 || isDrawing || isPaused;
-            
-            // Botões auxiliares de Imprimir/Limpar/Resetar SÓ SÃO DESABILITADOS DURANTE A ROLAGEM
-            btnImprimirSorteados.disabled = nomesSorteados.length === 0 || isDrawing;
-            btnLimparSorteados.disabled = nomesSorteados.length === 0 || isDrawing;
-            btnResetarSorteados.disabled = nomesSorteados.length === 0 || isDrawing;
-            
-            // ⭐️ AJUSTE AQUI: Controles de Adição/Exclusão só devem ser desabilitados durante a ROLAGEM
-            btnAdicionar.disabled = isDrawing;
-            novoNomeInput.disabled = isDrawing;
-            document.querySelectorAll('.btn-excluir').forEach(btn => btn.disabled = isDrawing);
+            salvarJSON('sorteio_candidatos', nomes);
+            salvarJSON('sorteio_sorteados', nomesSorteados);
+            salvarJSON('sorteio_log', logSorteios);
 
-            // Garante que o botão Continuar esteja ativo durante a pausa
-            if(isPaused) {
-                btnContinuar.disabled = false;
-            } else if (nomes.length === 0 && !isDrawing) {
-                btnSortear.disabled = true;
-                resultadoEl.textContent = "🥳 Sorteio Finalizado! Lista de Candidatos vazia.";
-            }
-            
-            // 4. Salvar no Local Storage
-            salvarNomes('sorteio_candidatos', nomes);
-            salvarNomes('sorteio_sorteados', nomesSorteados);
+            atualizarProgresso();
+            atualizarLogVisual();
         }
 
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-        
-        // Função de Pausa Manual
-        function waitForUserClick() {
-            return new Promise(resolve => {
-                resolvePausa = resolve;
-                sorteioPausado = true;
-                
-                // Esconde o botão Sortear e mostra o Continuar
-                btnSortear.style.display = 'none';
-                btnContinuar.style.display = 'block';
-                
-                // ⭐️ AJUSTE AQUI: Removemos o texto da contagem duplicada do botão
-                btnContinuar.textContent = `Continuar Sorteio`; 
-                
-                // Os botões auxiliares estão liberados pela lógica de atualizarLista
-                btnContinuar.disabled = false;
-                
-                // Chamamos atualizarLista para aplicar o estado 'isPaused' corretamente
-                atualizarLista(); 
-            });
-        }
-        
-        // Função para Continuar o Sorteio
-        function continuarSorteio() {
-            if (sorteioPausado && resolvePausa) {
-                sorteioPausado = false;
-                btnContinuar.style.display = 'none';
-                btnSortear.style.display = 'block';
-                
-                // A atualização da lista (incluindo o re-enable de botões) ocorrerá implicitamente antes do próximo sorteio
-                
-                // ⭐️ Importante: Chamar atualizarLista antes de resolver a promise para garantir que o Sortear não fique desabilitado sem motivo se houver nomes
-                atualizarLista();
+        // Tela cheia
+        function abrirTelaCheia() {
+            overlayEl.style.display = 'flex';
+            btnFecharOverlayEl.style.display = 'none';
+            instrucaoContinuarEl.style.display = 'none';
+            btnProximoOverlay.disabled = true;
+            btnPararAutoOverlay.style.display = autoMode ? 'inline-block' : 'none';
 
-                // O fluxo de sorteio é reiniciado/continuado
-                resolvePausa(); 
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => { });
             }
         }
-        
+
+        function fecharTelaCheia() {
+            overlayEl.style.display = 'none';
+            if (document.exitFullscreen && document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+            cancelarAuto();
+        }
+
         function lancarConfetti() {
-            const duration = 4 * 1000;
-            const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-            
-            function randomInRange(min, max) {
-                return Math.random() * (max - min) + min;
-            }
-
-            const interval = setInterval(function() {
-                const timeLeft = animationEnd - Date.now();
-
-                if (timeLeft <= 0) {
-                    return clearInterval(interval);
-                }
-
-                const particleCount = 50 * (timeLeft / duration);
-                const colors = ['#388E3C', '#66BB6A', '#ffffff']; 
-                
-                confetti(Object.assign({}, defaults, { particleCount, colors: colors, origin: { x: randomInRange(0.1, 0.3), y: randomInRange(0.7, 0.9) } }));
-                confetti(Object.assign({}, defaults, { particleCount, colors: colors, origin: { x: randomInRange(0.7, 0.9), y: randomInRange(0.7, 0.9) } }));
-            }, 250);
+            const cfg = { startVelocity: 40, spread: 360, ticks: 100, zIndex: 10000, colors: ['#66BB6A', '#388E3C', '#FFFFFF', '#FFEB3B'] };
+            confetti(Object.assign({}, cfg, { particleCount: 120, origin: { y: 0.6 } }));
+            setTimeout(() => confetti(Object.assign({}, cfg, { particleCount: 120, origin: { y: 0.6 } })), 400);
         }
 
-        async function sortear() {
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
+        async function realizarRodadaDeSorteio() {
+            if (nomes.length === 0) {
+                textoFullscreenEl.textContent = "FIM";
+                subtituloOverlayEl.textContent = "Todos os candidatos foram sorteados!";
+                instrucaoContinuarEl.style.display = 'none';
+                btnFecharOverlayEl.style.display = 'block';
+                btnProximoOverlay.disabled = true;
+                btnPararAutoOverlay.style.display = 'none';
+                isSorteando = false;
+                cancelarAuto();
+                return;
             }
 
-            while (nomes.length > 0) {
-                
-                // Desabilitar todos os botões no INÍCIO do sorteio
-                document.querySelectorAll('.btn-acao, .input-area button').forEach(btn => btn.disabled = true);
-                document.querySelectorAll('.btn-excluir').forEach(btn => btn.disabled = true);
-                novoNomeInput.disabled = true;
+            isSorteando = true;
+            textoFullscreenEl.classList.remove('zoom-vencedor');
+            textoFullscreenEl.style.color = '#ffffff';
+            textoFullscreenEl.classList.add('animacao-sorteio-fs');
 
-                // --- SORTEIO DE 1 VENCEDOR ---
-                
-                resultadoEl.textContent = `Sorteando o ${nomesSorteados.length + 1}º Vencedor...`;
-                resultadoEl.classList.add('animacao-sorteio'); 
-                resultadoEl.classList.remove('vencedor');
+            const total = getTotalAtual();
+            const proximoNumero = nomesSorteados.length + 1;
+            subtituloOverlayEl.textContent = `Sorteando o ${proximoNumero}º vencedor...`;
+            contadorOverlayEl.textContent = `Sorteio ${proximoNumero} de ${total}`;
 
-                const ciclos = 30 + Math.floor(Math.random() * 20);
-                let indiceFinal = Math.floor(Math.random() * nomes.length);
-                let nomeVencedor;
-                
-                // Simulação de rolagem
-                for(let i = 0; i < ciclos; i++) {
-                    playClickBeep(); 
-                    let indiceRolagem = i % nomes.length;
-                    resultadoEl.textContent = nomes[indiceRolagem];
-                    let fatorDesaceleracao = Math.pow(i / ciclos, 3); 
-                    let tempoEspera = 50 + fatorDesaceleracao * 300; 
-                    await sleep(tempoEspera);
-                }
-                
-                // Anuncia o Vencedor
-                nomeVencedor = nomes[indiceFinal]; 
-                resultadoEl.textContent = `🎉 ${nomeVencedor} 🎉`; 
-                resultadoEl.classList.remove('animacao-sorteio');
-                resultadoEl.classList.add('vencedor');
-                
-                playWinnerMelody(); 
-                lancarConfetti();
-                
-                // Mover o vencedor
-                const nomeIndex = nomes.indexOf(nomeVencedor); 
-                nomesSorteados.unshift(nomes.splice(nomeIndex, 1)[0]);
-                
-                // Chama atualizarLista para liberar os botões auxiliares
-                atualizarLista(); 
-                
-                await sleep(4000); 
+            instrucaoContinuarEl.style.display = 'none';
+            btnFecharOverlayEl.style.display = 'none';
+            btnProximoOverlay.disabled = true;
 
-                // --- PAUSA INTERATIVA ---
-                
-                if (nomes.length > 0) {
-                    await waitForUserClick(); // Espera pelo clique no botão Continuar
-                } 
-                
-            } // FIM DO WHILE (Sorteio Contínuo)
+            const ciclos = 30 + Math.floor(Math.random() * 20);
+            const indiceFinal = Math.floor(Math.random() * nomes.length);
 
-            // Finaliza quando a lista estiver vazia
-            
-            btnSortear.style.display = 'block'; 
-            btnContinuar.style.display = 'none';
-            
-            resultadoEl.classList.remove('vencedor');
-            resultadoEl.textContent = "🥳 Sorteio Finalizado! Todos os candidatos foram sorteados.";
-            
-            // Reabilita todos os controles
-            document.querySelectorAll('.btn-acao, .input-area button').forEach(btn => btn.disabled = false);
-            novoNomeInput.disabled = false;
-            novoNomeInput.value = '';
-            novoNomeInput.focus();
+            // CÓDIGO PARA ANIMAÇÃO ALEATÓRIA
+            for (let i = 0; i < ciclos; i++) {
+                const indiceAleatorio = Math.floor(Math.random() * nomes.length); 
+                playClickBeep();
+                textoFullscreenEl.textContent = nomes[indiceAleatorio];
+                await sleep(50 + Math.pow(i / ciclos, 3) * 280);
+            }
+            // FIM DO CÓDIGO ALEATÓRIO
+
+            const nomeVencedor = nomes[indiceFinal];
+            textoFullscreenEl.classList.remove('animacao-sorteio-fs');
+            textoFullscreenEl.textContent = nomeVencedor;
+            textoFullscreenEl.style.color = '#66BB6A';
+            textoFullscreenEl.classList.add('zoom-vencedor');
+
+            subtituloOverlayEl.textContent = "🎉 VENCEDOR(A) 🎉";
+
+            playWinnerMelody();
+            lancarConfetti();
+
+            nomesSorteados.unshift(nomes.splice(indiceFinal, 1)[0]);
+            resultadoEl.textContent = `Último sorteado: ${nomeVencedor}`;
+
+            const agora = new Date();
+            logSorteios.unshift({
+                ordem: nomesSorteados.length,
+                nome: nomeVencedor,
+                dataHora: agora.toLocaleString('pt-BR')
+            });
 
             atualizarLista();
-        }
 
-        // --- Outras Funções (Sem Alteração) ---
-        
-        function imprimirSorteados() {
-            if (nomesSorteados.length === 0) {
-                alert("Não há nomes sorteados para imprimir.");
-                return;
-            }
+            const totalNovo = getTotalAtual();
+            contadorOverlayEl.textContent = `Sorteio ${nomesSorteados.length} de ${totalNovo}`;
 
-            let htmlContent = `
-                <h1>Lista Oficial de Vencedores (${new Date().toLocaleDateString('pt-BR')})</h1>
-                <ul>
-            `;
-            for (let i = nomesSorteados.length - 1; i >= 0; i--) {
-                htmlContent += `<li>${nomesSorteados.length - i}º Vencedor: ${nomesSorteados[i]}</li>`;
-            }
-            htmlContent += `</ul>`;
+            isSorteando = false;
+            btnFecharOverlayEl.style.display = 'block';
 
-            const printContainer = document.querySelector('.print-container');
-            printContainer.innerHTML = htmlContent;
-            
-            window.print();
-            
-            printContainer.innerHTML = '';
-        }
-        
-        function resetarSorteadosParaCandidatos() {
-            if (nomesSorteados.length === 0) {
-                alert("A lista de sorteados já está vazia. Não há nomes para resetar.");
-                return;
-            }
+            if (nomes.length > 0) {
+                instrucaoContinuarEl.textContent = `Aperte ESPAÇO ou clique em "Próximo" para o ${nomesSorteados.length + 1}º sorteio.`;
+                instrucaoContinuarEl.style.display = 'block';
+                btnProximoOverlay.disabled = false;
 
-            if (confirm("ATENÇÃO: Deseja realmente mover TODOS os nomes sorteados de volta para a lista de Candidatos?")) {
-                nomes = nomes.concat(nomesSorteados); 
-                nomesSorteados = [];
-                
-                btnSortear.style.display = 'block';
-                btnContinuar.style.display = 'none';
-                resultadoEl.textContent = "Aguardando sorteio...";
-
-                atualizarLista();
-                alert("Os nomes sorteados foram resetados e estão de volta à lista de candidatos.");
-            }
-        }
-
-        function capitalizeName(name) {
-            return name.toLowerCase().split(' ').map(word => {
-                if (word.length > 0) {
-                    return word.charAt(0).toUpperCase() + word.slice(1);
+                if (autoMode) {
+                    agendarAuto();
+                    btnPararAutoOverlay.style.display = 'inline-block';
                 }
-                return '';
-            }).join(' ');
+            } else {
+                instrucaoContinuarEl.style.display = 'none';
+                btnProximoOverlay.disabled = true;
+                btnPararAutoOverlay.style.display = 'none';
+                cancelarAuto();
+            }
         }
 
+        async function iniciarSorteio() {
+            if (getTotalAtual() === 0 || nomes.length === 0) {
+                alert('Adicione candidatos antes de iniciar.');
+                return;
+            }
+            if (audioContext.state === 'suspended') audioContext.resume();
+            abrirTelaCheia();
+            await realizarRodadaDeSorteio();
+        }
+
+        async function continuarSorteioFS() {
+            if (isSorteando) return;
+            btnFecharOverlayEl.style.display = 'none';
+            btnProximoOverlay.disabled = true;
+            await realizarRodadaDeSorteio();
+        }
+
+        // Auto
+        function agendarAuto() {
+            cancelarAuto();
+            const seg = parseInt(intervaloAutoInput.value, 10) || 5;
+            autoTimeoutId = setTimeout(() => {
+                if (overlayEl.style.display === 'flex' && nomes.length > 0 && !isSorteando) {
+                    continuarSorteioFS();
+                }
+            }, seg * 1000);
+        }
+
+        function cancelarAuto() {
+            if (autoTimeoutId) {
+                clearTimeout(autoTimeoutId);
+                autoTimeoutId = null;
+            }
+        }
+
+        // CRUD nomes
         function adicionarNome() {
-            let novoNome = novoNomeInput.value.trim();
-            if (novoNome === '') {
-                alert('Digite um nome válido para adicionar.');
-                return;
-            }
-            
-            novoNome = capitalizeName(novoNome); 
-
-            if (nomes.some(n => n === novoNome) || nomesSorteados.some(n => n === novoNome)) {
-                alert('Esse nome já está na lista de candidatos ou já foi sorteado.');
-                return;
-            }
-            nomes.push(novoNome);
-            atualizarLista();
+            let n = novoNomeInput.value.trim();
+            if (!n) return alert('Digite um nome válido.');
+            n = n.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            if (nomes.includes(n) || nomesSorteados.includes(n)) return alert('Nome já existe.');
+            nomes.push(n);
             novoNomeInput.value = '';
-            novoNomeInput.focus();
+            atualizarLista();
         }
         
-        function removerNome(nomeParaExcluir) {
-            if (confirm(`Tem certeza que deseja remover "${nomeParaExcluir}" da lista?`)) {
-                nomes = nomes.filter(nome => nome !== nomeParaExcluir);
-                atualizarLista();
-            }
+        // FUNÇÃO DE IMPORTAÇÃO DE NOMES
+        function importarNomes() {
+            const arquivo = arquivoNomesInput.files[0];
+            if (!arquivo) return alert('Selecione um arquivo .txt ou .csv com nomes em cada linha.');
+
+            const leitor = new FileReader();
+            
+            leitor.onload = function(e) {
+                const conteudo = e.target.result;
+                const novosNomes = conteudo.split(/\r?\n/).map(n => n.trim()).filter(n => n.length > 0);
+                let nomesAdicionados = 0;
+                let nomesExistentes = 0;
+
+                novosNomes.forEach(n => {
+                    let nomeNormalizado = n.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+                    if (nomes.includes(nomeNormalizado) || nomesSorteados.includes(nomeNormalizado)) {
+                        nomesExistentes++;
+                    } else {
+                        nomes.push(nomeNormalizado);
+                        nomesAdicionados++;
+                    }
+                });
+
+                if (nomesAdicionados > 0) {
+                    alert(`${nomesAdicionados} nomes importados com sucesso!\n${nomesExistentes} nomes ignorados (já existiam ou estavam vazios).`);
+                    arquivoNomesInput.value = ''; // Limpa o campo
+                    atualizarLista();
+                } else {
+                    alert(`Nenhum novo nome foi adicionado. ${nomesExistentes} nomes já existiam na lista.`);
+                }
+            };
+
+            leitor.onerror = function() {
+                alert('Erro ao ler o arquivo.');
+            };
+
+            leitor.readAsText(arquivo);
         }
-        
+        // FIM FUNÇÃO IMPORTAÇÃO
+
+        // NOVA FUNÇÃO PARA LIMPAR TODOS OS CANDIDATOS
+        function limparCandidatos() {
+            if (nomes.length === 0) return alert("Lista de candidatos já está vazia.");
+            if (!confirm("Tem certeza que deseja apagar TODOS os candidatos?")) return;
+            
+            nomes = [];
+            atualizarLista();
+            resultadoEl.textContent = 'Lista de candidatos limpa.';
+        }
+        // FIM NOVA FUNÇÃO
+
+        function removerNome(n) {
+            if (!confirm(`Remover "${n}"?`)) return;
+            nomes = nomes.filter(x => x !== n);
+            atualizarLista();
+        }
+
         function limparSorteados() {
+            if (nomesSorteados.length === 0) return alert("Lista de sorteados vazia.");
+            if (!confirm("Limpar lista de vencedores? (Os nomes serão perdidos do histórico de vencedores)")) return;
+            nomesSorteados = [];
+            atualizarLista();
+        }
+
+        function resetarSorteadosParaCandidatos() {
+            if (nomesSorteados.length === 0) return alert("Lista de sorteados vazia.");
+            if (!confirm("Voltar os sorteados para a lista de candidatos?")) return;
+            nomes = nomes.concat(nomesSorteados);
+            nomesSorteados = [];
+            atualizarLista();
+        }
+
+        // Impressão e CSV
+        function imprimirSorteados() {
+            if (nomesSorteados.length === 0) return alert("Nada para imprimir.");
+            let html = `<h1>Vencedores</h1><ul>`;
+            nomesSorteados.forEach((n, i) => html += `<li>${nomesSorteados.length - i}º: ${n}</li>`);
+            html += `</ul>`;
+            const pc = document.querySelector('.print-container');
+            pc.innerHTML = html;
+            pc.style.display = 'block';
+            window.print();
+            pc.style.display = 'none';
+        }
+
+        function exportarCSV() {
             if (nomesSorteados.length === 0) {
-                alert("A lista de sorteados já está vazia.");
+                alert('Nenhum vencedor para exportar.');
                 return;
             }
-            if (confirm("Você tem certeza que deseja limpar toda a lista de Vencedores Sorteados (eles serão perdidos se não estiverem na lista de candidatos)?")) {
-                nomesSorteados = [];
-
-                if(nomes.length > 0) {
-                    btnSortear.style.display = 'block';
-                    btnContinuar.style.display = 'none';
-                    resultadoEl.textContent = "Aguardando sorteio...";
-                } else {
-                    resultadoEl.textContent = "Lista de candidatos vazia.";
-                }
-
-                atualizarLista();
-                alert("Lista de sorteados limpa com sucesso!");
-            }
+            let linhas = ['ordem;nome;data_hora'];
+            logSorteios
+                .sort((a, b) => a.ordem - b.ordem)
+                .forEach(l => {
+                    linhas.push(`${l.ordem};"${l.nome.replace(/"/g, '""')}";"${l.dataHora}"`);
+                });
+            const csv = linhas.join('\r\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'vencedores_sorteio.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
-        // Event Listeners
-        btnSortear.addEventListener('click', sortear);
+        // Tema
+        btnTema.addEventListener('click', () => {
+            document.body.classList.toggle('tema-escuro');
+        });
+
+        // Eventos
+        btnSortear.addEventListener('click', iniciarSorteio);
         btnAdicionar.addEventListener('click', adicionarNome);
-        btnLimparSorteados.addEventListener('click', limparSorteados);
-        btnImprimirSorteados.addEventListener('click', imprimirSorteados); 
-        btnResetarSorteados.addEventListener('click', resetarSorteadosParaCandidatos); 
-        btnContinuar.addEventListener('click', continuarSorteio); 
+        novoNomeInput.addEventListener('keyup', e => { if (e.key === 'Enter') adicionarNome(); });
         
-        // Permitir adicionar nome ao pressionar Enter no input
-        novoNomeInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') {
-                adicionarNome();
+        // EVENTOS NOVOS
+        btnImportar.addEventListener('click', importarNomes);
+        btnLimparCandidatos.addEventListener('click', limparCandidatos); // NOVO EVENTO
+
+        btnLimparSorteados.addEventListener('click', limparSorteados);
+        btnImprimirSorteados.addEventListener('click', imprimirSorteados);
+        btnResetarSorteados.addEventListener('click', resetarSorteadosParaCandidatos);
+        btnExportarCSV.addEventListener('click', exportarCSV);
+
+        chkAuto.addEventListener('change', () => {
+            autoMode = chkAuto.checked;
+            if (!autoMode) {
+                cancelarAuto();
+                btnPararAutoOverlay.style.display = 'none';
+            } else if (overlayEl.style.display === 'flex' && !isSorteando && nomes.length > 0) {
+                agendarAuto();
+                btnPararAutoOverlay.style.display = 'inline-block';
             }
         });
 
-        // Inicializa lista na tela
+        intervaloAutoInput.addEventListener('change', () => {
+            if (autoMode && overlayEl.style.display === 'flex') {
+                agendarAuto();
+            }
+        });
+
+        btnFecharOverlayEl.addEventListener('click', fecharTelaCheia);
+
+        btnProximoOverlay.addEventListener('click', () => {
+            if (!isSorteando && nomes.length > 0) {
+                continuarSorteioFS();
+            }
+        });
+
+        btnPararAutoOverlay.addEventListener('click', () => {
+            autoMode = false;
+            chkAuto.checked = false;
+            cancelarAuto();
+            btnPararAutoOverlay.style.display = 'none';
+        });
+
+        // Teclado
+        document.addEventListener('keydown', async (e) => {
+            if (
+                overlayEl.style.display === 'flex' &&
+                !isSorteando &&
+                nomes.length > 0 &&
+                e.code === 'Space'
+            ) {
+                e.preventDefault();
+                await continuarSorteioFS();
+                return;
+            }
+
+            if (overlayEl.style.display === 'flex' && e.key === 'Escape') {
+                fecharTelaCheia();
+            }
+        });
+
+        // Inicializa
         atualizarLista();
     </script>
 </body>
