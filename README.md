@@ -1,6 +1,6 @@
 # 🏆 Sorteador Corporativo - Documentação
 
-Olá Dr. Hasegawa. Este documento é o guia da estrutura e das funcionalidades do sistema de sorteio corporativo, feito em um único arquivo HTML para máxima portabilidade ("baixar e abrir").
+Este documento é o guia da estrutura e das funcionalidades do sistema de sorteio corporativo, feito em um único arquivo HTML para máxima portabilidade ("baixar e abrir").
 
 ## 🚀 Uso Simplificado
 
